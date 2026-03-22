@@ -8,7 +8,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import "./global.css";
-import { HomeScreen } from "./src/screens/HomeScreen";
+import { Home } from "./src/screens/Home";
 const Stack = createNativeStackNavigator();
 
 SplashScreen.preventAutoHideAsync();
@@ -34,7 +34,7 @@ export default function App() {
       <Stack.Navigator>
         <Stack.Screen
           name="Home"
-          component={HomeScreen}
+          component={Home}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
