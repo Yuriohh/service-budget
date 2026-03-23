@@ -14,6 +14,7 @@ export interface Budget {
   items: BudgetItem[];
   discount?: number;
   status: BudgetStatus;
+  totalPrice: number;
   createdAt: string;
   updatedAt: string;
 }
