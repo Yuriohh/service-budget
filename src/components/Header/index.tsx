@@ -3,7 +3,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 type HeaderProps = {
   title: string;
-  subtitle: string;
+  subtitle?: string;
 };
 
 export function Header({ title, subtitle }: HeaderProps) {
