@@ -11,6 +11,7 @@ import { forwardRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { StatusBadge } from "../BudgetStatus";
 import { Button } from "../Button";
+import { HorizontalLine } from "../HorizontalLine";
 
 type SortOption = "newest" | "oldest" | "highest" | "lowest";
 
@@ -29,7 +30,7 @@ const STATUS_OPTIONS: BudgetStatus[] = [
 ];
 
 export const FilterModal = forwardRef<BottomSheetModal>((props, ref) => {
-  const snapPoints = ["60%"];
+  const snapPoints = ["70%"];
   const { dismiss } = useBottomSheetModal();
 
   const [selectStatuses, setSelectStatues] = useState<BudgetStatus[]>([]);
@@ -57,7 +58,7 @@ export const FilterModal = forwardRef<BottomSheetModal>((props, ref) => {
           </TouchableOpacity>
         </View>
 
-        <View className="h-[1px] w-[150%] bg-base-gray200 -ml-6 my-6" />
+        <HorizontalLine className="my-6" />
 
         <Text className="text-title-sm mb-4">Status</Text>
 
@@ -115,7 +116,7 @@ export const FilterModal = forwardRef<BottomSheetModal>((props, ref) => {
           );
         })}
 
-        <View className="h-[1px] w-[150%] bg-base-gray200 -ml-6 my-6" />
+        <HorizontalLine className="my-6" />
 
         <View className="flex-row items-center justify-center gap-4 mt-2">
           <Button
