@@ -10,6 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "./global.css";
+import { BudgetdDetails } from "./src/screens/BudgetDetails";
 import { Home } from "./src/screens/Home";
 
 const Stack = createNativeStackNavigator();
@@ -40,6 +41,11 @@ export default function App() {
             <Stack.Screen
               name="Home"
               component={Home}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="BudgetDetails"
+              component={BudgetdDetails}
               options={{ headerShown: false }}
             />
           </Stack.Navigator>

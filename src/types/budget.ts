@@ -2,6 +2,7 @@ export type BudgetStatus = "draft" | "sent" | "approved" | "rejected";
 
 export interface BudgetItem {
   id: string;
+  title: string;
   description: string;
   quantity: number;
   price: number;
