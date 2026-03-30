@@ -4,7 +4,7 @@ import { Text, TouchableOpacity, TouchableOpacityProps } from "react-native";
 
 type ButtonProps = TouchableOpacityProps & {
   title: string;
-  variant?: "solid" | "outline";
+  variant?: "solid" | "outline" | "dashed";
   icon?: ReactNode;
 };
 
@@ -22,9 +22,10 @@ export function Button({
       activeOpacity={0.7}
       className={cn(
         "flex-row items-center justify-center rounded-full h-12 px-6 gap-2",
-        isSolid
-          ? "bg-main-purpleBase"
-          : "bg-transparent border border-base-gray300",
+        variant === "solid" && "bg-main-purpleBase",
+        variant === "outline" && "bg-transparent border border-base-gray300",
+        variant === "dashed" &&
+          "bg-transparent border border-dashed border-base-gray300",
         className,
       )}
       {...rest}
