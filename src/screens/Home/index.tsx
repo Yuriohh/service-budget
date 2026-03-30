@@ -18,6 +18,7 @@ const mockData: Budget[] = [
     items: [
       {
         id: "1",
+        title: "Serviço 1",
         description: "Serviço 1",
         quantity: 1,
         price: 100,
@@ -36,6 +37,7 @@ const mockData: Budget[] = [
     items: [
       {
         id: "2",
+        title: "Serviço 2",
         description: "Serviço 2",
         quantity: 1,
         price: 100,
