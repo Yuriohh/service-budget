@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import { Plus } from "lucide-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -7,6 +8,8 @@ type HeaderProps = {
 };
 
 export function Header({ title, subtitle }: HeaderProps) {
+  const navigation = useNavigation<any>();
+
   return (
     <View className="flex-row justify-between items-center w-full px-6">
       <View>
@@ -15,7 +18,10 @@ export function Header({ title, subtitle }: HeaderProps) {
         </Text>
         <Text className="text-title-sm text-base-gray500">{subtitle}</Text>
       </View>
-      <TouchableOpacity className="flex-row items-center gap-2 bg-main-purpleBase px-4 py-3 rounded-xl">
+      <TouchableOpacity
+        className="flex-row items-center gap-2 bg-main-purpleBase px-4 py-3 rounded-full"
+        onPress={() => navigation.navigate("BudgetDetails")}
+      >
         <Plus size={24} color="#fff" />
         <Text className="text-text-sm text-white">Novo</Text>
       </TouchableOpacity>
