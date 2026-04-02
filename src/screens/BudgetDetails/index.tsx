@@ -3,9 +3,11 @@ import { Button } from "@/src/components/Button";
 import { HorizontalLine } from "@/src/components/HorizontalLine";
 import { Input } from "@/src/components/Input";
 import { RadioButton } from "@/src/components/RadioButton";
+import { ServiceModal } from "@/src/components/ServiceModal";
 import { colors } from "@/src/themes/colors";
 import { BudgetStatus } from "@/src/types/budget";
 import { formatCurrency } from "@/src/utils/formatCurrency";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useNavigation } from "@react-navigation/native";
 import {
   BriefcaseBusiness,
@@ -16,7 +18,7 @@ import {
   Tag,
   Wallet,
 } from "lucide-react-native";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -47,6 +49,7 @@ const mockServices = [
 export function BudgetdDetails() {
   const navigation = useNavigation<any>();
   const [selectedStatus, setSelectedStatus] = useState<BudgetStatus>("draft");
+  const modalRef = useRef<BottomSheetModal>(null);
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
@@ -153,6 +156,7 @@ export function BudgetdDetails() {
             variant="dashed"
             icon={<Plus size={20} color={colors.main.purpleBase} />}
             className="w-full mt-2"
+            onPress={() => modalRef?.current?.present()}
           />
         </View>
 
@@ -212,6 +216,8 @@ export function BudgetdDetails() {
         <Button title="Cancelar" variant="outline" className="" />
         <Button title="Salvar" variant="solid" className="" />
       </View>
+
+      <ServiceModal ref={modalRef} />
     </SafeAreaView>
   );
 }
