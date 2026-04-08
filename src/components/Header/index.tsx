@@ -8,7 +8,7 @@ type HeaderProps = {
 };
 
 export function Header({ title, subtitle }: HeaderProps) {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
 
   return (
     <View className="flex-row justify-between items-center w-full px-6">
@@ -20,7 +20,7 @@ export function Header({ title, subtitle }: HeaderProps) {
       </View>
       <TouchableOpacity
         className="flex-row items-center gap-2 bg-main-purpleBase px-4 py-3 rounded-full"
-        onPress={() => navigation.navigate("BudgetDetails")}
+        onPress={() => navigation.navigate("BudgetForm")}
       >
         <Plus size={24} color="#fff" />
         <Text className="text-text-sm text-white">Novo</Text>
