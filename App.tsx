@@ -10,10 +10,12 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "./global.css";
-import { BudgetdDetails } from "./src/screens/BudgetDetails";
+import { RootStackParamList } from "./src/@types/navigation";
+import { BudgetDetails } from "./src/screens/BudgetDetails";
+import { BudgetForm } from "./src/screens/BudgetForm";
 import { Home } from "./src/screens/Home";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -44,8 +46,13 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
+              name="BudgetForm"
+              component={BudgetForm}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
               name="BudgetDetails"
-              component={BudgetdDetails}
+              component={BudgetDetails}
               options={{ headerShown: false }}
             />
           </Stack.Navigator>
