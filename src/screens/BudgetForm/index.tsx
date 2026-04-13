@@ -4,8 +4,9 @@ import { HorizontalLine } from "@/src/components/HorizontalLine";
 import { Input } from "@/src/components/Input";
 import { RadioButton } from "@/src/components/RadioButton";
 import { ServiceModal } from "@/src/components/ServiceModal";
+import { budgetCreate } from "@/src/storage/budget/budgetCreate";
 import { colors } from "@/src/themes/colors";
-import { BudgetStatus } from "@/src/types/budget";
+import { Budget, BudgetItem, BudgetStatus } from "@/src/types/budget";
 import { formatCurrency } from "@/src/utils/formatCurrency";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useNavigation } from "@react-navigation/native";
@@ -21,6 +22,7 @@ import {
 import { useRef, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import uuid from "react-native-uuid";
 
 const STATUS_OPTIONS: BudgetStatus[] = [
   "draft",
@@ -29,27 +31,47 @@ const STATUS_OPTIONS: BudgetStatus[] = [
   "rejected",
 ];
 
-const mockServices = [
-  {
-    id: "1",
-    title: "Design de interfaces",
-    description: "Criação de wireframes e protóti...",
-    price: 3847.5,
-    quantity: 1,
-  },
-  {
-    id: "2",
-    title: "Implantação e suporte",
-    description: "Publicação nas lojas de aplicativ...",
-    price: 3847.5,
-    quantity: 1,
-  },
-];
-
 export function BudgetForm() {
   const navigation = useNavigation();
-  const [selectedStatus, setSelectedStatus] = useState<BudgetStatus>("draft");
   const modalRef = useRef<BottomSheetModal>(null);
+
+  const [selectedStatus, setSelectedStatus] = useState<BudgetStatus>("draft");
+  const [title, setTitle] = useState("");
+  const [client, setClient] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [services, setServices] = useState<BudgetItem[]>([]);
+
+  const subtotal = services.reduce(
+    (acc, service) => acc + service.price * service.quantity,
+    0,
+  );
+  const rawDiscount = Number(discount) || 0;
+  const discountValue = subtotal * (rawDiscount / 100);
+  const total = subtotal - discountValue;
+
+  async function handleSaveNewBudget() {
+    if (!title || !client) return;
+
+    const newBudget: Budget = {
+      id: uuid.v4() as string,
+      title,
+      client,
+      status: selectedStatus,
+      discount: rawDiscount,
+      totalPrice: total,
+      items: services,
+      createdAt: new Date().toLocaleDateString("pt-BR"),
+      updatedAt: new Date().toLocaleDateString("pt-BR"),
+    };
+
+    try {
+      await budgetCreate(newBudget);
+
+      navigation.navigate("Home");
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
@@ -80,8 +102,18 @@ export function BudgetForm() {
           <HorizontalLine className="my-4" />
 
           <View className="gap-3">
-            <Input placeholder="Título" />
-            <Input placeholder="Cliente" />
+            <Input
+              placeholder="Título"
+              className="px-4"
+              value={title}
+              onChangeText={setTitle}
+            />
+            <Input
+              placeholder="Cliente"
+              className="px-4"
+              value={client}
+              onChangeText={setClient}
+            />
           </View>
         </View>
 
@@ -119,7 +151,7 @@ export function BudgetForm() {
 
           <HorizontalLine className="my-4" />
 
-          {mockServices.map((service) => (
+          {services.map((service) => (
             <View key={service.id} className="mb-4">
               <View className="flex-row justify-between">
                 <View className="flex-1 pr-4">
@@ -175,9 +207,11 @@ export function BudgetForm() {
               Subtotal
             </Text>
             <View className="flex-row items-center gap-3">
-              <Text className="text-text-sm text-base-gray500">2 Itens</Text>
+              <Text className="text-text-sm text-base-gray500">
+                {services.length}
+              </Text>
               <Text className="text-text-md text-base-gray600">
-                {formatCurrency(7695)}
+                {formatCurrency(subtotal)}
               </Text>
             </View>
           </View>
@@ -188,13 +222,15 @@ export function BudgetForm() {
               <View className="flex-row items-center border border-base-gray200 rounded-2xl px-3 bg-white h-10 gap-1">
                 <Input
                   className="h-full border-0 p-0 rounded-none w-8 text-center"
-                  placeholder="8"
+                  placeholder="0"
                   keyboardType="numeric"
+                  value={discount}
+                  onChangeText={setDiscount}
                 />
                 <Text className="text-text-md text-base-gray600">%</Text>
               </View>
-              <Text className="text-text-md text-feedback-dangerLight">
-                -{formatCurrency(615.6)}
+              <Text className="text-text-md text-feedback-dangerDark">
+                -{formatCurrency(discountValue)}
               </Text>
             </View>
           </View>
@@ -205,7 +241,7 @@ export function BudgetForm() {
             <Text className="text-text-md text-base-gray600">Valor Total</Text>
             <View className="items-end justify-center">
               <Text className="text-title-lg font-bold">
-                {formatCurrency(7079.4)}
+                {formatCurrency(total)}
               </Text>
             </View>
           </View>
@@ -214,10 +250,20 @@ export function BudgetForm() {
 
       <View className="justify-center px-6 py-4 border-t border-base-gray200 bg-white flex-row gap-4">
         <Button title="Cancelar" variant="outline" className="" />
-        <Button title="Salvar" variant="solid" className="" />
+        <Button
+          title="Salvar"
+          variant="solid"
+          className=""
+          onPress={handleSaveNewBudget}
+        />
       </View>
 
-      <ServiceModal ref={modalRef} />
+      <ServiceModal
+        ref={modalRef}
+        onAddService={(newService) =>
+          setServices((prev) => [...prev, newService])
+        }
+      />
     </SafeAreaView>
   );
 }
