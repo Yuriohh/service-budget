@@ -5,11 +5,17 @@ import { Input } from "@/src/components/Input";
 import { RadioButton } from "@/src/components/RadioButton";
 import { ServiceModal } from "@/src/components/ServiceModal";
 import { budgetCreate } from "@/src/storage/budget/budgetCreate";
+import { budgetGetById } from "@/src/storage/budget/budgetGetById";
+import { budgetUpdate } from "@/src/storage/budget/budgetUpdate";
 import { colors } from "@/src/themes/colors";
 import { Budget, BudgetItem, BudgetStatus } from "@/src/types/budget";
 import { formatCurrency } from "@/src/utils/formatCurrency";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useNavigation } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import {
   BriefcaseBusiness,
   ChevronLeft,
@@ -19,7 +25,7 @@ import {
   Tag,
   Wallet,
 } from "lucide-react-native";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import uuid from "react-native-uuid";
@@ -41,6 +47,33 @@ export function BudgetForm() {
   const [discount, setDiscount] = useState("");
   const [services, setServices] = useState<BudgetItem[]>([]);
 
+  const route = useRoute();
+  const idFromRoute = (route.params as any)?.id;
+
+  useFocusEffect(
+    useCallback(() => {
+      async function loadExistingBudget() {
+        if (idFromRoute) {
+          const budget = await budgetGetById(idFromRoute);
+          if (budget) {
+            setTitle(budget.title);
+            setClient(budget.client);
+            setServices(budget.items);
+            setDiscount(budget.discount ? budget.discount.toString() : "");
+            setSelectedStatus(budget.status);
+          }
+        } else {
+          setTitle("");
+          setClient("");
+          setServices([]);
+          setDiscount("");
+          setSelectedStatus("draft");
+        }
+      }
+      loadExistingBudget();
+    }, [idFromRoute]),
+  );
+
   const subtotal = services.reduce(
     (acc, service) => acc + service.price * service.quantity,
     0,
@@ -53,7 +86,7 @@ export function BudgetForm() {
     if (!title || !client) return;
 
     const newBudget: Budget = {
-      id: uuid.v4() as string,
+      id: idFromRoute ?? (uuid.v4() as string),
       title,
       client,
       status: selectedStatus,
@@ -65,7 +98,11 @@ export function BudgetForm() {
     };
 
     try {
-      await budgetCreate(newBudget);
+      if (idFromRoute) {
+        await budgetUpdate(newBudget);
+      } else {
+        await budgetCreate(newBudget);
+      }
 
       navigation.navigate("Home");
     } catch (error) {
