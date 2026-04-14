@@ -1,62 +1,40 @@
 import { BudgetCard } from "@/src/components/BudgetCard";
 import { FilterModal } from "@/src/components/FilterModal";
 import { SearchInput } from "@/src/components/SearchInput";
+import { budgetGetAll } from "@/src/storage/budget/budgetGetAll";
 import { colors } from "@/src/themes/colors";
 import { Budget } from "@/src/types/budget";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { useFocusEffect } from "@react-navigation/native";
 import { SlidersHorizontal } from "lucide-react-native";
-import { useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Header } from "../../components/Header";
 
-const mockData: Budget[] = [
-  {
-    id: "1",
-    title: "Serviço 1",
-    client: "Cliente 1",
-    items: [
-      {
-        id: "1",
-        title: "Serviço 1",
-        description: "Serviço 1",
-        quantity: 1,
-        price: 100,
-      },
-    ],
-    discount: 0,
-    status: "approved",
-    totalPrice: 100,
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-  },
-  {
-    id: "2",
-    title: "Serviço 2",
-    client: "Cliente 2",
-    items: [
-      {
-        id: "2",
-        title: "Serviço 2",
-        description: "Serviço 2",
-        quantity: 1,
-        price: 100,
-      },
-    ],
-    discount: 0,
-    status: "rejected",
-    totalPrice: 100,
-    createdAt: "2022-01-01",
-    updatedAt: "2022-01-01",
-  },
-];
-
 export function Home() {
   const filterModalRef = useRef<BottomSheetModal>(null);
+
+  const [budgets, setBudgets] = useState<Budget[]>([]);
 
   function handleOpenFilter() {
     filterModalRef.current?.present();
   }
+
+  async function fetchData() {
+    try {
+      const data = await budgetGetAll();
+      setBudgets(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, []),
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
@@ -76,7 +54,7 @@ export function Home() {
       </View>
 
       <FlatList
-        data={mockData}
+        data={budgets}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <BudgetCard data={item} />}
         contentContainerStyle={{

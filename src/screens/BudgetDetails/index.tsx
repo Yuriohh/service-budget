@@ -1,9 +1,16 @@
 import { StatusBadge } from "@/src/components/BudgetStatus";
 import { Button } from "@/src/components/Button";
 import { HorizontalLine } from "@/src/components/HorizontalLine";
+import { budgetGetById } from "@/src/storage/budget/budgetGetById";
+import { budgetRemove } from "@/src/storage/budget/budgetRemove";
 import { colors } from "@/src/themes/colors";
+import { Budget } from "@/src/types/budget";
 import { formatCurrency } from "@/src/utils/formatCurrency";
-import { useNavigation } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import {
   ChevronLeft,
   Copy,
@@ -14,7 +21,8 @@ import {
   Trash2,
   Wallet,
 } from "lucide-react-native";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useCallback, useState } from "react";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const mockBudgetDetails = {
@@ -44,6 +52,59 @@ const mockServices = [
 
 export function BudgetDetails() {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { id } = route.params as { id: string };
+
+  const [budget, setBudget] = useState<Budget | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchDetails() {
+        const data = await budgetGetById(id);
+        if (data) {
+          setBudget(data);
+        }
+      }
+      fetchDetails();
+    }, [id]),
+  );
+
+  async function handleDelete() {
+    Alert.alert(
+      "Remover Orçamento",
+      "Essa ação é irreversível. Deseja mesmo deletar este orçamento ?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            await budgetRemove(id);
+            navigation.navigate("Home");
+          },
+        },
+      ],
+    );
+  }
+
+  if (!budget) {
+    return (
+      <View className="flex-1 bg-slate-50 items-center justify-center">
+        <Text>Carregando...</Text>
+      </View>
+    );
+  }
+
+  const subtotal = budget.items.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0,
+  );
+  const discountValue = budget.discount
+    ? subtotal * (budget.discount / 100)
+    : 0;
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
@@ -56,7 +117,7 @@ export function BudgetDetails() {
         </TouchableOpacity>
 
         <Text className="text-title-md font-bold text-center mr-20 flex-1">
-          Orçamento {mockBudgetDetails.id}
+          {budget.title}
         </Text>
         <StatusBadge status="sent" />
       </View>
@@ -68,7 +129,7 @@ export function BudgetDetails() {
               <Store size={24} color={colors.main.purpleBase} />
             </View>
             <Text className="flex-1 text-title-md font-bold text-base-gray600">
-              {mockBudgetDetails.title}
+              {budget.title}
             </Text>
           </View>
 
@@ -77,7 +138,7 @@ export function BudgetDetails() {
           <View className="mb-4">
             <Text className="text-text-sm text-base-gray500 mb-1">Cliente</Text>
             <Text className="text-text-md text-base-gray600 font-bold">
-              {mockBudgetDetails.client}
+              {budget.client}
             </Text>
           </View>
           <View className="flex-row">
@@ -86,7 +147,7 @@ export function BudgetDetails() {
                 Criado em
               </Text>
               <Text className="text-text-md text-base-gray600">
-                {mockBudgetDetails.createdAt}
+                {budget.createdAt}
               </Text>
             </View>
             <View className="w-1/2">
@@ -94,7 +155,7 @@ export function BudgetDetails() {
                 Atualizado em
               </Text>
               <Text className="text-text-md text-base-gray600">
-                {mockBudgetDetails.updatedAt}
+                {budget.updatedAt}
               </Text>
             </View>
           </View>
@@ -110,23 +171,23 @@ export function BudgetDetails() {
 
           <HorizontalLine className="my-4" />
 
-          {mockServices.map((service, index) => (
-            <View key={service.id}>
+          {budget.items.map((item, index) => (
+            <View key={item.id}>
               <View className="flex-row justify-between mb-2 mt-4">
                 <View className="flex-1 pr-4">
                   <Text className="text-text-md font-bold text-base-gray600">
-                    {service.title}
+                    {item.title}
                   </Text>
                   <Text className="text-text-sm text-base-gray500 mt-1">
-                    {service.description}
+                    {item.description}
                   </Text>
                 </View>
                 <View className="items-end">
                   <Text className="text-text-md font-bold text-base-gray600">
-                    {formatCurrency(service.price)}
+                    {formatCurrency(item.price)}
                   </Text>
                   <Text className="text-text-sm text-base-gray500 mt-1">
-                    Qt: {service.quantity}
+                    Qt: {item.quantity}
                   </Text>
                 </View>
               </View>
@@ -142,28 +203,34 @@ export function BudgetDetails() {
             <View className="flex-row justify-between items-center mb-1">
               <Text className="text-text-md text-base-gray500">Subtotal</Text>
               <Text className="text-text-sm text-base-gray400 line-through">
-                {formatCurrency(4050)}
+                {formatCurrency(subtotal)}
               </Text>
             </View>
             <View className="flex-row justify-between items-center mb-6">
               <View className="flex-row items-center gap-2">
                 <Text className="text-text-md text-base-gray500">Desconto</Text>
-                <View className="bg-green-100 px-2 py-0.5 rounded-md">
-                  <Text className="text-green-700 font-bold text-[10px]">
-                    5% OFF
-                  </Text>
-                </View>
+                {budget.discount ? (
+                  <View className="bg-green-100 px-2 py-0.5 rounded-md">
+                    <Text className="text-green-700 font-bold text-[10px]">
+                      {budget.discount}% OFF
+                    </Text>
+                  </View>
+                ) : null}
               </View>
-              <Text className="text-text-sm text-feedback-successBase font-bold">
-                - {formatCurrency(200)}
-              </Text>
+              {budget.discount ? (
+                <Text className="text-text-sm text-feedback-successBase font-bold">
+                  - {formatCurrency(discountValue)}
+                </Text>
+              ) : (
+                <Text className="text-text-sm text-base-gray400">-</Text>
+              )}
             </View>
             <View className="flex-row justify-between items-end mt-2">
               <Text className="text-text-md font-bold text-base-gray600">
                 Investimento total
               </Text>
               <Text className="text-title-sm font-bold text-base-gray600">
-                {formatCurrency(3847.5)}
+                {formatCurrency(budget.totalPrice)}
               </Text>
             </View>
           </View>
@@ -172,7 +239,11 @@ export function BudgetDetails() {
 
       <View className="px-6 py-4 bg-white border-t border-base-gray200 flex-row justify-between">
         <View className="flex-row gap-3">
-          <TouchableOpacity className="w-12 h-12 rounded-full border border-feedback-dangerBase items-center justify-center">
+          <TouchableOpacity
+            className="w-12 h-12 rounded-full border border-feedback-dangerBase items-center justify-center"
+            activeOpacity={0.7}
+            onPress={handleDelete}
+          >
             <Trash2 size={24} color={colors.feedback.dangerBase} />
           </TouchableOpacity>
           <TouchableOpacity className="w-12 h-12 rounded-full border border-base-gray300 items-center justify-center">
@@ -180,9 +251,7 @@ export function BudgetDetails() {
           </TouchableOpacity>
           <TouchableOpacity
             className="w-12 h-12 rounded-full border border-base-gray300 items-center justify-center"
-            onPress={() =>
-              navigation.navigate("BudgetForm", { id: mockBudgetDetails.id })
-            }
+            onPress={() => navigation.navigate("BudgetForm", { id: budget.id })}
           >
             <Pencil size={24} color={colors.main.purpleBase} />
           </TouchableOpacity>

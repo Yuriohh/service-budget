@@ -20,7 +20,7 @@ type ServiceModalProps = {
 
 export const ServiceModal = forwardRef<BottomSheetModal, ServiceModalProps>(
   ({ onAddService }, ref) => {
-    const snapPoints = ["75%"];
+    const snapPoints = ["70%"];
     const { dismiss } = useBottomSheetModal();
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
