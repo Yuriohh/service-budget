@@ -47,6 +47,8 @@ export function BudgetForm() {
   const [discount, setDiscount] = useState("");
   const [services, setServices] = useState<BudgetItem[]>([]);
 
+  const [editingService, setEditingService] = useState<BudgetItem | null>(null);
+
   const route = useRoute();
   const idFromRoute = (route.params as any)?.id;
 
@@ -82,9 +84,7 @@ export function BudgetForm() {
   const discountValue = subtotal * (rawDiscount / 100);
   const total = subtotal - discountValue;
 
-  async function handleSaveNewBudget() {
-    if (!title || !client) return;
-
+  async function handleSaveBudget() {
     const newBudget: Budget = {
       id: idFromRoute ?? (uuid.v4() as string),
       title,
@@ -213,7 +213,13 @@ export function BudgetForm() {
                     </Text>
                   </View>
 
-                  <TouchableOpacity activeOpacity={0.7}>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => {
+                      setEditingService(service);
+                      modalRef?.current?.present();
+                    }}
+                  >
                     <Pencil size={20} color={colors.main.purpleBase} />
                   </TouchableOpacity>
                 </View>
@@ -225,7 +231,10 @@ export function BudgetForm() {
             variant="dashed"
             icon={<Plus size={20} color={colors.main.purpleBase} />}
             className="w-full mt-2"
-            onPress={() => modalRef?.current?.present()}
+            onPress={() => {
+              setEditingService(null);
+              modalRef?.current?.present();
+            }}
           />
         </View>
 
@@ -291,7 +300,7 @@ export function BudgetForm() {
           title="Salvar"
           variant="solid"
           className=""
-          onPress={handleSaveNewBudget}
+          onPress={handleSaveBudget}
         />
       </View>
 
@@ -299,6 +308,19 @@ export function BudgetForm() {
         ref={modalRef}
         onAddService={(newService) =>
           setServices((prev) => [...prev, newService])
+        }
+        serviceToEdit={editingService}
+        onEditingService={(updatedService) =>
+          setServices((prev) =>
+            prev.map((service) =>
+              service.id === updatedService.id ? updatedService : service,
+            ),
+          )
+        }
+        onRemoveService={(serviceToRemove) =>
+          setServices((prev) =>
+            prev.filter((service) => service.id !== serviceToRemove.id),
+          )
         }
       />
     </SafeAreaView>
