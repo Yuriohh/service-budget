@@ -4,6 +4,7 @@ import { SearchInput } from "@/src/components/SearchInput";
 import { budgetGetAll } from "@/src/storage/budget/budgetGetAll";
 import { colors } from "@/src/themes/colors";
 import { Budget } from "@/src/types/budget";
+import { filterByTitle } from "@/src/utils/filterByTitle";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useFocusEffect } from "@react-navigation/native";
 import { SlidersHorizontal } from "lucide-react-native";
@@ -17,6 +18,8 @@ export function Home() {
 
   const [budgets, setBudgets] = useState<Budget[]>([]);
 
+  const [search, setSearch] = useState("");
+
   function handleOpenFilter() {
     filterModalRef.current?.present();
   }
@@ -24,6 +27,7 @@ export function Home() {
   async function fetchData() {
     try {
       const data = await budgetGetAll();
+
       setBudgets(data);
     } catch (error) {
       console.log(error);
@@ -36,6 +40,9 @@ export function Home() {
     }, []),
   );
 
+  const budgetToDisplay =
+    search === "" ? budgets : filterByTitle(budgets, search);
+
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
       <Header title="Orçamentos" />
@@ -43,7 +50,11 @@ export function Home() {
       <View className="h-[1px] bg-base-gray300 w-full my-4" />
       <View className="w-full px-6 my-6">
         <View className="flex-row items-center gap-3 w-full">
-          <SearchInput placeholder="Buscar serviço" />
+          <SearchInput
+            placeholder="Buscar orçamento"
+            value={search}
+            onChangeText={setSearch}
+          />
           <TouchableOpacity
             className="bg-base-gray200 w-12 h-12 rounded-xl items-center justify-center"
             onPress={handleOpenFilter}
@@ -54,7 +65,7 @@ export function Home() {
       </View>
 
       <FlatList
-        data={budgets}
+        data={budgetToDisplay}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <BudgetCard data={item} />}
         contentContainerStyle={{
