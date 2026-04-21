@@ -25,31 +25,6 @@ import { useCallback, useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const mockBudgetDetails = {
-  id: "1",
-  title: "Desenvolvimento de app",
-  client: "Yuriohh",
-  createdAt: "22/08/2024",
-  updatedAt: "22/08/2025",
-};
-
-const mockServices = [
-  {
-    id: "1",
-    title: "Design de interfaces",
-    description: "Criação de wireframes e protóti...",
-    price: 3847.5,
-    quantity: 1,
-  },
-  {
-    id: "2",
-    title: "Implantação e suporte",
-    description: "Publicação nas lojas de aplicativ...",
-    price: 3847.5,
-    quantity: 1,
-  },
-];
-
 export function BudgetDetails() {
   const navigation = useNavigation();
   const route = useRoute();
