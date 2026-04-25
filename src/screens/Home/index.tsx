@@ -4,7 +4,7 @@ import { SearchInput } from "@/src/components/SearchInput";
 import { budgetGetAll } from "@/src/storage/budget/budgetGetAll";
 import { colors } from "@/src/themes/colors";
 import { Budget } from "@/src/types/budget";
-import { filterByTitle } from "@/src/utils/filterByTitle";
+import { searchByTitle } from "@/src/utils/searchByTitle";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useFocusEffect } from "@react-navigation/native";
 import { SlidersHorizontal } from "lucide-react-native";
@@ -41,7 +41,7 @@ export function Home() {
   );
 
   const budgetToDisplay =
-    search === "" ? budgets : filterByTitle(budgets, search);
+    search === "" ? budgets : searchByTitle(budgets, search);
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
