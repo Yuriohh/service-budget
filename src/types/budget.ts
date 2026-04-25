@@ -1,4 +1,10 @@
 export type BudgetStatus = "draft" | "sent" | "approved" | "rejected";
+export type ValueSortOption = "newest" | "oldest" | "highest" | "lowest";
+export type LabelSortOption =
+  | "Mais Recente"
+  | "Mais Antigo"
+  | "Maior Valor"
+  | "Menor Valor";
 
 export interface BudgetItem {
   id: string;
@@ -18,4 +24,9 @@ export interface Budget {
   totalPrice: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface SortOption {
+  value: ValueSortOption;
+  label: LabelSortOption;
 }

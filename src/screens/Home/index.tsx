@@ -3,7 +3,8 @@ import { FilterModal } from "@/src/components/FilterModal";
 import { SearchInput } from "@/src/components/SearchInput";
 import { budgetGetAll } from "@/src/storage/budget/budgetGetAll";
 import { colors } from "@/src/themes/colors";
-import { Budget } from "@/src/types/budget";
+import { Budget, BudgetStatus, SortOption } from "@/src/types/budget";
+import { orderOptions } from "@/src/utils/orderOptions";
 import { searchByTitle } from "@/src/utils/searchByTitle";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useFocusEffect } from "@react-navigation/native";
@@ -19,6 +20,12 @@ export function Home() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
 
   const [search, setSearch] = useState("");
+
+  const [selectedStatus, setSelectedStatus] = useState<BudgetStatus[]>([]);
+  const [dateSorted, setDateSorted] = useState<SortOption>({
+    value: "newest",
+    label: "Mais Recente",
+  });
 
   function handleOpenFilter() {
     filterModalRef.current?.present();
@@ -43,6 +50,15 @@ export function Home() {
   const budgetToDisplay =
     search === "" ? budgets : searchByTitle(budgets, search);
 
+  const budgetFiltered =
+    selectedStatus.length > 0
+      ? budgetToDisplay.filter((budget) =>
+          selectedStatus.includes(budget.status),
+        )
+      : budgetToDisplay;
+
+  const budgetSorted = orderOptions(dateSorted.value, budgetFiltered);
+
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
       <Header title="Orçamentos" />
@@ -65,7 +81,7 @@ export function Home() {
       </View>
 
       <FlatList
-        data={budgetToDisplay}
+        data={budgetSorted}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <BudgetCard data={item} />}
         contentContainerStyle={{
@@ -76,7 +92,11 @@ export function Home() {
         showsVerticalScrollIndicator={false}
       />
 
-      <FilterModal ref={filterModalRef} />
+      <FilterModal
+        ref={filterModalRef}
+        onApplyFilters={setSelectedStatus}
+        onOrderOptions={setDateSorted}
+      />
     </SafeAreaView>
   );
 }
