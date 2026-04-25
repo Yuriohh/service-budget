@@ -1,6 +1,6 @@
 import { Budget } from "../types/budget";
 
-export function filterByTitle(budgets: Budget[], target: string): Budget[] {
+export function searchByTitle(budgets: Budget[], target: string): Budget[] {
   budgets.sort((a, b) => a.title.localeCompare(b.title));
 
   let low = 0;
