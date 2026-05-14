@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx expo start*)",
+      "Bash(npx expo start --android)",
+      "Bash(npx expo start --ios)",
+      "Bash(npx expo start --web)",
+      "Bash(npm run lint)",
+      "Bash(npm run build:prepare)",
+      "Bash(npm install*)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch*)",
+      "Bash(find . *)",
+      "Bash(grep *)"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'echo \"$CLAUDE_TOOL_INPUT\" | grep -qE \"\\.(ts|tsx)$\" && npm run lint --silent 2>&1 || true'"
+          }
+        ]
+      }
+    ]
+  }
+}
