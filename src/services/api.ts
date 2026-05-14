@@ -1,3 +1,6 @@
+import { AUTH_TOKEN_KEY } from "@/src/storage/storageConfig";
+import axios from "axios";
+import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
 const BASE_URL =
@@ -5,19 +8,21 @@ const BASE_URL =
     ? "http://10.0.2.2:3333"
     : "http://localhost:3333";
 
-async function post<T>(path: string, body: object): Promise<T> {
-  const response = await fetch(`${BASE_URL}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+export const api = axios.create({ baseURL: BASE_URL });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message ?? "Erro inesperado. Tente novamente.");
+api.interceptors.request.use(async (config) => {
+  const token = await SecureStore.getItemAsync(AUTH_TOKEN_KEY);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
+  return config;
+});
 
-  return response.json();
-}
-
-export const api = { post };
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const message =
+      error.response?.data?.message ?? "Erro inesperado. Tente novamente.";
+    return Promise.reject(new Error(message));
+  },
+);
