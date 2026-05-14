@@ -11,9 +11,13 @@ const BASE_URL =
 export const api = axios.create({ baseURL: BASE_URL });
 
 api.interceptors.request.use(async (config) => {
-  const token = await SecureStore.getItemAsync(AUTH_TOKEN_KEY);
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  try {
+    const token = await SecureStore.getItemAsync(AUTH_TOKEN_KEY);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    console.warn("[api] não foi possível ler o token:", error);
   }
   return config;
 });
@@ -21,6 +25,12 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.warn("[api] erro na resposta:", {
+      status: error.response?.status,
+      url: error.config?.url,
+      method: error.config?.method,
+      data: error.response?.data,
+    });
     const message =
       error.response?.data?.message ?? "Erro inesperado. Tente novamente.";
     return Promise.reject(new Error(message));

@@ -19,7 +19,7 @@ import { z } from "zod";
 
 const signInSchema = z.object({
   email: z.string().min(1, "E-mail obrigatório").email("E-mail inválido"),
-  senha: z.string().min(1, "Senha obrigatória"),
+  password: z.string().min(1, "Senha obrigatória"),
 });
 
 type SignInFormData = z.infer<typeof signInSchema>;
@@ -38,9 +38,9 @@ export function SignIn() {
     resolver: zodResolver(signInSchema),
   });
 
-  async function handleSignIn({ email, senha }: SignInFormData) {
+  async function handleSignIn({ email, password }: SignInFormData) {
     try {
-      await signIn(email, senha);
+      await signIn(email, password);
     } catch (error) {
       Alert.alert(
         "Erro ao entrar",
@@ -93,7 +93,7 @@ export function SignIn() {
             <View className="gap-1">
               <Controller
                 control={control}
-                name="senha"
+                name="password"
                 render={({ field: { value, onChange, onBlur } }) => (
                   <Input
                     placeholder="Senha"
@@ -105,9 +105,9 @@ export function SignIn() {
                   />
                 )}
               />
-              {errors.senha && (
+              {errors.password && (
                 <Text className="text-text-xs text-red-500 px-1">
-                  {errors.senha.message}
+                  {errors.password.message}
                 </Text>
               )}
             </View>

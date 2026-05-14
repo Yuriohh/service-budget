@@ -18,9 +18,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { z } from "zod";
 
 const signUpSchema = z.object({
-  nome: z.string().min(1, "Nome obrigatório"),
+  name: z.string().min(1, "Nome obrigatório"),
   email: z.string().min(1, "E-mail obrigatório").email("E-mail inválido"),
-  senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
+  password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
 });
 
 type SignUpFormData = z.infer<typeof signUpSchema>;
@@ -38,9 +38,9 @@ export function SignUp() {
     resolver: zodResolver(signUpSchema),
   });
 
-  async function handleSignUp({ nome, email, senha }: SignUpFormData) {
+  async function handleSignUp({ name, email, password }: SignUpFormData) {
     try {
-      await api.post("/user/register", { nome, email, senha });
+      await api.post("/user/register", { name, email, password });
       Alert.alert("Conta criada!", "Faça login para continuar.", [
         { text: "OK", onPress: () => navigation.navigate("SignIn") },
       ]);
@@ -74,7 +74,7 @@ export function SignUp() {
             <View className="gap-1">
               <Controller
                 control={control}
-                name="nome"
+                name="name"
                 render={({ field: { value, onChange, onBlur } }) => (
                   <Input
                     placeholder="Nome"
@@ -87,9 +87,9 @@ export function SignUp() {
                   />
                 )}
               />
-              {errors.nome && (
+              {errors.name && (
                 <Text className="text-text-xs text-red-500 px-1">
-                  {errors.nome.message}
+                  {errors.name.message}
                 </Text>
               )}
             </View>
@@ -121,7 +121,7 @@ export function SignUp() {
             <View className="gap-1">
               <Controller
                 control={control}
-                name="senha"
+                name="password"
                 render={({ field: { value, onChange, onBlur } }) => (
                   <Input
                     placeholder="Senha"
@@ -133,9 +133,9 @@ export function SignUp() {
                   />
                 )}
               />
-              {errors.senha && (
+              {errors.password && (
                 <Text className="text-text-xs text-red-500 px-1">
-                  {errors.senha.message}
+                  {errors.password.message}
                 </Text>
               )}
             </View>

@@ -23,7 +23,7 @@ type SignInResponse = {
 type AuthContextData = {
   user: User | null;
   isLoadingUser: boolean;
-  signIn: (email: string, senha: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -35,10 +35,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
 
-  async function signIn(email: string, senha: string) {
+  async function signIn(email: string, password: string) {
     const { data } = await api.post<SignInResponse>("/user/login", {
       email,
-      senha,
+      password,
     });
     await SecureStore.setItemAsync(AUTH_TOKEN_KEY, data.token);
     await SecureStore.setItemAsync(AUTH_USER_KEY, JSON.stringify(data.user));
