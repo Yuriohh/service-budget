@@ -2,8 +2,8 @@ import { AuthStackParamList } from "@/src/@types/navigation";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
 import { api } from "@/src/services/api";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
 import {
   Alert,
@@ -31,7 +31,7 @@ export function SignUp() {
     }
     try {
       setIsLoading(true);
-      await api.post("/users/register", {
+      await api.post("/user/register", {
         nome: nome.trim(),
         email: email.trim(),
         senha,
@@ -42,7 +42,9 @@ export function SignUp() {
     } catch (error) {
       Alert.alert(
         "Erro ao cadastrar",
-        error instanceof Error ? error.message : "Não foi possível criar a conta."
+        error instanceof Error
+          ? error.message
+          : "Não foi possível criar a conta.",
       );
     } finally {
       setIsLoading(false);
