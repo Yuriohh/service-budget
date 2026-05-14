@@ -1,6 +1,6 @@
 import { api } from "@/src/services/api";
 import { AUTH_TOKEN_KEY, AUTH_USER_KEY } from "@/src/storage/storageConfig";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import {
   createContext,
   ReactNode,
@@ -11,7 +11,7 @@ import {
 
 type User = {
   id: string;
-  nome: string;
+  name: string;
   email: string;
 };
 
@@ -36,17 +36,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoadingUser, setIsLoadingUser] = useState(true);
 
   async function signIn(email: string, senha: string) {
-    const { token, user } = await api.post<SignInResponse>("/user/login", {
+    const { data } = await api.post<SignInResponse>("/user/login", {
       email,
       senha,
     });
-    await AsyncStorage.setItem(AUTH_TOKEN_KEY, token);
-    await AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
-    setUser(user);
+    await SecureStore.setItemAsync(AUTH_TOKEN_KEY, data.token);
+    await SecureStore.setItemAsync(AUTH_USER_KEY, JSON.stringify(data.user));
+    setUser(data.user);
   }
 
   async function signOut() {
-    await AsyncStorage.multiRemove([AUTH_TOKEN_KEY, AUTH_USER_KEY]);
+    await SecureStore.deleteItemAsync(AUTH_TOKEN_KEY);
+    await SecureStore.deleteItemAsync(AUTH_USER_KEY);
     setUser(null);
   }
 
@@ -54,8 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async function loadStoredUser() {
       try {
         const [token, userData] = await Promise.all([
-          AsyncStorage.getItem(AUTH_TOKEN_KEY),
-          AsyncStorage.getItem(AUTH_USER_KEY),
+          SecureStore.getItemAsync(AUTH_TOKEN_KEY),
+          SecureStore.getItemAsync(AUTH_USER_KEY),
         ]);
         if (token && userData) {
           setUser(JSON.parse(userData));

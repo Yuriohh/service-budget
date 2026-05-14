@@ -2,9 +2,10 @@ import { AuthStackParamList } from "@/src/@types/navigation";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
 import { useAuth } from "@/src/contexts/AuthContext";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -14,31 +15,37 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { z } from "zod";
+
+const signInSchema = z.object({
+  email: z.string().min(1, "E-mail obrigatório").email("E-mail inválido"),
+  senha: z.string().min(1, "Senha obrigatória"),
+});
+
+type SignInFormData = z.infer<typeof signInSchema>;
 
 type SignInNavigation = NativeStackNavigationProp<AuthStackParamList, "SignIn">;
 
 export function SignIn() {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
   const { signIn } = useAuth();
   const navigation = useNavigation<SignInNavigation>();
 
-  async function handleSignIn() {
-    if (!email.trim() || !senha.trim()) {
-      return Alert.alert("Atenção", "Preencha e-mail e senha.");
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema),
+  });
+
+  async function handleSignIn({ email, senha }: SignInFormData) {
     try {
-      setIsLoading(true);
-      await signIn(email.trim(), senha);
+      await signIn(email, senha);
     } catch (error) {
       Alert.alert(
         "Erro ao entrar",
-        error instanceof Error ? error.message : "Não foi possível fazer login."
+        error instanceof Error ? error.message : "Não foi possível fazer login.",
       );
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -59,28 +66,57 @@ export function SignIn() {
           </View>
 
           <View className="gap-3">
-            <Input
-              placeholder="E-mail"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              value={email}
-              onChangeText={setEmail}
-              className="px-4"
-            />
-            <Input
-              placeholder="Senha"
-              secureTextEntry
-              value={senha}
-              onChangeText={setSenha}
-              className="px-4"
-            />
+            <View className="gap-1">
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { value, onChange, onBlur } }) => (
+                  <Input
+                    placeholder="E-mail"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    className="px-4"
+                  />
+                )}
+              />
+              {errors.email && (
+                <Text className="text-text-xs text-red-500 px-1">
+                  {errors.email.message}
+                </Text>
+              )}
+            </View>
+
+            <View className="gap-1">
+              <Controller
+                control={control}
+                name="senha"
+                render={({ field: { value, onChange, onBlur } }) => (
+                  <Input
+                    placeholder="Senha"
+                    secureTextEntry
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    className="px-4"
+                  />
+                )}
+              />
+              {errors.senha && (
+                <Text className="text-text-xs text-red-500 px-1">
+                  {errors.senha.message}
+                </Text>
+              )}
+            </View>
           </View>
 
           <Button
-            title={isLoading ? "Entrando..." : "Entrar"}
-            onPress={handleSignIn}
-            disabled={isLoading}
+            title={isSubmitting ? "Entrando..." : "Entrar"}
+            onPress={handleSubmit(handleSignIn)}
+            disabled={isSubmitting}
           />
 
           <TouchableOpacity

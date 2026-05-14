@@ -6,6 +6,7 @@ import {
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -17,6 +18,8 @@ import { BudgetForm } from "./src/screens/BudgetForm";
 import { Home } from "./src/screens/Home";
 import { SignIn } from "./src/screens/SignIn";
 import { SignUp } from "./src/screens/SignUp";
+
+const queryClient = new QueryClient();
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const AppStack = createNativeStackNavigator<RootStackParamList>();
@@ -65,14 +68,16 @@ export default function App() {
   if (!fontsLoaded) return null;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <BottomSheetModalProvider>
-        <AuthProvider>
-          <NavigationContainer>
-            <Routes />
-          </NavigationContainer>
-        </AuthProvider>
-      </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+    <QueryClientProvider client={queryClient}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <BottomSheetModalProvider>
+          <AuthProvider>
+            <NavigationContainer>
+              <Routes />
+            </NavigationContainer>
+          </AuthProvider>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    </QueryClientProvider>
   );
 }
