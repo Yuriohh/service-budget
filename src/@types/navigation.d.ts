@@ -4,6 +4,11 @@ export declare global {
   }
 }
 
+export type AuthStackParamList = {
+  SignIn: undefined;
+  SignUp: undefined;
+};
+
 export type RootStackParamList = {
   Home: undefined;
   BudgetForm: { id?: string } | undefined;
