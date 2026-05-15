@@ -26,7 +26,7 @@ import {
   Wallet,
 } from "lucide-react-native";
 import { useCallback, useRef, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import uuid from "react-native-uuid";
 
@@ -104,9 +104,12 @@ export function BudgetForm() {
         await budgetCreate(newBudget);
       }
 
-      navigation.navigate("Home");
+      navigation.goBack();
     } catch (error) {
-      console.log(error);
+      Alert.alert(
+        "Erro ao salvar",
+        error instanceof Error ? error.message : "Tente novamente.",
+      );
     }
   }
 
