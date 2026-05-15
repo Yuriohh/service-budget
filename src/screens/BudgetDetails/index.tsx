@@ -80,6 +80,7 @@ export function BudgetDetails() {
   const discountValue = budget.discount
     ? subtotal * (budget.discount / 100)
     : 0;
+  const total = subtotal - discountValue;
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
@@ -94,7 +95,7 @@ export function BudgetDetails() {
         <Text className="text-title-md font-bold text-center mr-20 flex-1">
           {budget.title}
         </Text>
-        <StatusBadge status="sent" />
+        <StatusBadge status={budget.status} />
       </View>
 
       <ScrollView className="flex-1 px-6 pt-6">
@@ -122,7 +123,7 @@ export function BudgetDetails() {
                 Criado em
               </Text>
               <Text className="text-text-md text-base-gray600">
-                {budget.createdAt}
+                {new Date(budget.createdAt).toLocaleDateString("pt-BR")}
               </Text>
             </View>
             <View className="w-1/2">
@@ -130,7 +131,7 @@ export function BudgetDetails() {
                 Atualizado em
               </Text>
               <Text className="text-text-md text-base-gray600">
-                {budget.updatedAt}
+                {new Date(budget.updatedAt).toLocaleDateString("pt-BR")}
               </Text>
             </View>
           </View>
@@ -205,7 +206,7 @@ export function BudgetDetails() {
                 Investimento total
               </Text>
               <Text className="text-title-sm font-bold text-base-gray600">
-                {formatCurrency(budget.totalPrice)}
+                {formatCurrency(total)}
               </Text>
             </View>
           </View>
