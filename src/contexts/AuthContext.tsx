@@ -1,9 +1,10 @@
-import { api } from "@/src/services/api";
+import { api, registerSignOut } from "@/src/services/api";
 import { AUTH_TOKEN_KEY, AUTH_USER_KEY } from "@/src/storage/storageConfig";
 import * as SecureStore from "expo-secure-store";
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -45,11 +46,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   }
 
-  async function signOut() {
+  const signOut = useCallback(async () => {
     await SecureStore.deleteItemAsync(AUTH_TOKEN_KEY);
     await SecureStore.deleteItemAsync(AUTH_USER_KEY);
     setUser(null);
-  }
+  }, []);
+
+  useEffect(() => {
+    registerSignOut(signOut);
+  }, [signOut]);
 
   useEffect(() => {
     async function loadStoredUser() {
