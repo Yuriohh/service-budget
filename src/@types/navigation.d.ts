@@ -13,4 +13,5 @@ export type RootStackParamList = {
   Home: undefined;
   BudgetForm: { id?: string } | undefined;
   BudgetDetails: { id?: string } | undefined;
+  Profile: undefined;
 };

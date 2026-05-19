@@ -16,6 +16,7 @@ import { AuthProvider, useAuth } from "./src/contexts/AuthContext";
 import { BudgetDetails } from "./src/screens/BudgetDetails";
 import { BudgetForm } from "./src/screens/BudgetForm";
 import { Home } from "./src/screens/Home";
+import { Profile } from "./src/screens/Profile";
 import { SignIn } from "./src/screens/SignIn";
 import { SignUp } from "./src/screens/SignUp";
 
@@ -41,6 +42,7 @@ function AppNavigator() {
       <AppStack.Screen name="Home" component={Home} />
       <AppStack.Screen name="BudgetForm" component={BudgetForm} />
       <AppStack.Screen name="BudgetDetails" component={BudgetDetails} />
+      <AppStack.Screen name="Profile" component={Profile} />
     </AppStack.Navigator>
   );
 }

@@ -61,7 +61,7 @@ export function Home() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
-      <Header title="Orçamentos" />
+      <Header title="Orçamentos" showProfileButton />
 
       <View className="h-[1px] bg-base-gray300 w-full my-4" />
       <View className="w-full px-6 my-6">
