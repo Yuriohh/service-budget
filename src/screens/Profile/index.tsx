@@ -60,21 +60,21 @@ export function Profile() {
             />
           </TouchableOpacity>
         </View>
+      </View>
 
-        <View className="bg-white border border-base-gray200 rounded-xl overflow-hidden mt-3">
-          <TouchableOpacity
-            activeOpacity={0.7}
-            className="flex-row items-center gap-4 px-4 py-4"
-            onPress={handleSignOut}
-          >
-            <View className="w-10 h-10 rounded-full bg-feedback-dangerLight items-center justify-center">
-              <LogOut size={18} color={colors.feedback.dangerBase} />
-            </View>
-            <Text className="flex-1 text-text-md font-bold text-feedback-dangerBase">
-              Sair da conta
-            </Text>
-          </TouchableOpacity>
-        </View>
+      <View className="px-6 pb-6">
+        <TouchableOpacity
+          activeOpacity={0.7}
+          className="flex-row items-center gap-4 px-4 py-4 bg-white border border-base-gray200 rounded-xl"
+          onPress={handleSignOut}
+        >
+          <View className="w-10 h-10 rounded-full bg-feedback-dangerLight items-center justify-center">
+            <LogOut size={18} color={colors.feedback.dangerBase} />
+          </View>
+          <Text className="flex-1 text-text-md font-bold text-feedback-dangerBase">
+            Sair da conta
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
