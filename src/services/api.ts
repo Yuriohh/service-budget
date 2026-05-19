@@ -1,5 +1,5 @@
 import { AUTH_TOKEN_KEY } from "@/src/storage/storageConfig";
-import axios from "axios";
+import { create as axiosCreate } from "axios";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
@@ -8,7 +8,7 @@ const BASE_URL =
     ? "http://10.0.2.2:3333"
     : "http://localhost:3333";
 
-export const api = axios.create({ baseURL: BASE_URL });
+export const api = axiosCreate({ baseURL: BASE_URL });
 
 const API_ERROR_MESSAGES: Record<string, string> = {
   "Invalid credentials": "Credenciais inválidas.",

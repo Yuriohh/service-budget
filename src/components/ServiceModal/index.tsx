@@ -163,3 +163,5 @@ export const ServiceModal = forwardRef<BottomSheetModal, ServiceModalProps>(
     );
   },
 );
+
+ServiceModal.displayName = "ServiceModal";

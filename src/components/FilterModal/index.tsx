@@ -154,3 +154,5 @@ export const FilterModal = forwardRef<BottomSheetModal, FilterModalProps>(
     );
   },
 );
+
+FilterModal.displayName = "FilterModal";
