@@ -1,13 +1,92 @@
+import { Input } from "@/src/components/Input";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { colors } from "@/src/themes/colors";
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  useBottomSheetModal,
+} from "@gorhom/bottom-sheet";
 import { useNavigation } from "@react-navigation/native";
-import { ChevronLeft, LogOut, Pencil } from "lucide-react-native";
-import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { ChevronLeft, LogOut, Pencil, X } from "lucide-react-native";
+import { useRef, useMemo, useState } from "react";
+import { Alert, Text, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+function EditNameSheet({
+  currentName,
+  onSave,
+}: {
+  currentName: string;
+  onSave: (name: string) => Promise<void>;
+}) {
+  const { dismiss } = useBottomSheetModal();
+  const [name, setName] = useState(currentName);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSave() {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      setError("Informe um nome.");
+      return;
+    }
+    setError("");
+    setIsLoading(true);
+    try {
+      await onSave(trimmed);
+      dismiss();
+    } catch (err: any) {
+      setError(err?.message ?? "Erro ao atualizar nome.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <BottomSheetView className="p-6 pb-10 gap-4">
+      <View className="flex-row justify-between items-center mb-2">
+        <Text className="text-title-lg font-bold text-base-gray700">Editar nome</Text>
+        <TouchableOpacity onPress={() => dismiss()}>
+          <X size={24} color={colors.base.gray600} />
+        </TouchableOpacity>
+      </View>
+
+      <Input
+        placeholder="Novo nome"
+        className="pl-4"
+        value={name}
+        onChangeText={(v) => {
+          setName(v);
+          setError("");
+        }}
+        autoFocus
+      />
+
+      {!!error && (
+        <Text className="text-text-sm text-feedback-dangerBase">{error}</Text>
+      )}
+
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={handleSave}
+        disabled={isLoading}
+        className="h-12 rounded-2xl bg-main-purpleBase items-center justify-center"
+      >
+        {isLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text className="text-white font-bold text-text-md">Salvar</Text>
+        )}
+      </TouchableOpacity>
+    </BottomSheetView>
+  );
+}
 
 export function Profile() {
   const navigation = useNavigation();
-  const { user, signOut } = useAuth();
+  const { user, signOut, updateUser } = useAuth();
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ["40%"], []);
 
   const nameInitial = user?.name?.charAt(0).toUpperCase() ?? "?";
 
@@ -46,6 +125,7 @@ export function Profile() {
           <TouchableOpacity
             activeOpacity={0.7}
             className="flex-row items-center gap-4 px-4 py-4"
+            onPress={() => bottomSheetRef.current?.present()}
           >
             <View className="w-10 h-10 rounded-full bg-main-purpleLight items-center justify-center">
               <Pencil size={18} color={colors.main.purpleBase} />
@@ -76,6 +156,18 @@ export function Profile() {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <BottomSheetModal
+        ref={bottomSheetRef}
+        snapPoints={snapPoints}
+        handleIndicatorStyle={{ backgroundColor: colors.base.gray500 }}
+        enableDynamicSizing={false}
+      >
+        <EditNameSheet
+          currentName={user?.name ?? ""}
+          onSave={updateUser}
+        />
+      </BottomSheetModal>
     </SafeAreaView>
   );
 }
