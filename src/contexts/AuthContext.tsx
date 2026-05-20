@@ -26,6 +26,7 @@ type AuthContextData = {
   isLoadingUser: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  updateUser: (name: string) => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextData>(
@@ -44,6 +45,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await SecureStore.setItemAsync(AUTH_TOKEN_KEY, data.token);
     await SecureStore.setItemAsync(AUTH_USER_KEY, JSON.stringify(data.user));
     setUser(data.user);
+  }
+
+  async function updateUser(name: string) {
+    await api.patch("/user/update", { name });
+    const updated = { ...user!, name };
+    await SecureStore.setItemAsync(AUTH_USER_KEY, JSON.stringify(updated));
+    setUser(updated);
   }
 
   const signOut = useCallback(async () => {
@@ -74,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoadingUser, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, isLoadingUser, signIn, signOut, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
