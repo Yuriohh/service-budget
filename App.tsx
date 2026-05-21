@@ -7,6 +7,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as ExpoLinking from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -17,8 +18,18 @@ import { BudgetDetails } from "./src/screens/BudgetDetails";
 import { BudgetForm } from "./src/screens/BudgetForm";
 import { Home } from "./src/screens/Home";
 import { Profile } from "./src/screens/Profile";
+import { ResetPassword } from "./src/screens/ResetPassword";
 import { SignIn } from "./src/screens/SignIn";
 import { SignUp } from "./src/screens/SignUp";
+
+const linking = {
+  prefixes: [ExpoLinking.createURL("/")],
+  config: {
+    screens: {
+      ResetPassword: "reset-password",
+    },
+  },
+};
 
 const queryClient = new QueryClient();
 
@@ -32,6 +43,7 @@ function AuthNavigator() {
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="SignIn" component={SignIn} />
       <AuthStack.Screen name="SignUp" component={SignUp} />
+      <AuthStack.Screen name="ResetPassword" component={ResetPassword} />
     </AuthStack.Navigator>
   );
 }
@@ -43,6 +55,7 @@ function AppNavigator() {
       <AppStack.Screen name="BudgetForm" component={BudgetForm} />
       <AppStack.Screen name="BudgetDetails" component={BudgetDetails} />
       <AppStack.Screen name="Profile" component={Profile} />
+      <AppStack.Screen name="ResetPassword" component={ResetPassword} />
     </AppStack.Navigator>
   );
 }
@@ -74,7 +87,7 @@ export default function App() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <BottomSheetModalProvider>
           <AuthProvider>
-            <NavigationContainer>
+            <NavigationContainer linking={linking}>
               <Routes />
             </NavigationContainer>
           </AuthProvider>

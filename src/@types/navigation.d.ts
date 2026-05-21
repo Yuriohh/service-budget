@@ -8,6 +8,7 @@ export declare global {
 export type AuthStackParamList = {
   SignIn: undefined;
   SignUp: undefined;
+  ResetPassword: { token: string };
 };
 
 export type RootStackParamList = {
@@ -15,4 +16,5 @@ export type RootStackParamList = {
   BudgetForm: { id?: string } | undefined;
   BudgetDetails: { id?: string } | undefined;
   Profile: undefined;
+  ResetPassword: { token: string };
 };
