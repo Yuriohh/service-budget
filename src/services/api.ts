@@ -16,6 +16,8 @@ const API_ERROR_MESSAGES: Record<string, string> = {
   "Email already exists": "E-mail já cadastrado.",
   "User already exists": "Usuário já cadastrado.",
   "Budget not found": "Orçamento não encontrado.",
+  "Invalid token": "Token inválido ou expirado.",
+  "Token expired": "Token inválido ou expirado.",
   Unauthorized: "Não autorizado.",
 };
 
