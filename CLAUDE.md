@@ -17,9 +17,38 @@ npm run lint
 
 # Prepare native build
 npm run build:prepare
+
+# Tests
+npm test               # run all tests
+npm run test:watch     # watch mode
+npm run test:coverage  # with coverage report
 ```
 
-There is no test runner configured in this project.
+## Tests
+
+Stack: **Jest** (v29) + **jest-expo** preset + **@testing-library/react-native**.
+
+Test files live in `__tests__/` folders alongside the source they test:
+
+```
+src/
+  storage/
+    budget/
+      __tests__/
+        budgetCreate.test.ts
+        budgetUpdate.test.ts
+        budgetRemove.test.ts
+  components/
+    ComponentName/
+      __tests__/
+        index.test.tsx
+```
+
+Naming convention: `<subject>.test.ts` for logic, `<subject>.test.tsx` for components.
+
+Mocks:
+- `src/services/__mocks__/api.ts` — mocks the axios API client for all storage tests.
+- `__mocks__/expo-secure-store.ts` — mocks secure storage.
 
 ## Architecture
 
