@@ -13,15 +13,15 @@ npx expo start --android
 npx expo start --ios
 
 # Lint
-npm run lint
+yarn lint
 
 # Prepare native build
-npm run build:prepare
+yarn build:prepare
 
 # Tests
-npm test               # run all tests
-npm run test:watch     # watch mode
-npm run test:coverage  # with coverage report
+yarn test               # run all tests
+yarn test:watch         # watch mode
+yarn test:coverage      # with coverage report
 ```
 
 ## Tests
